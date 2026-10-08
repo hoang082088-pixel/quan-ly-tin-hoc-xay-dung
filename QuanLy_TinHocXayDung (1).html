@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý học phần - Tin học xây dựng</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#fff; --text:#172033; --muted:#667085;
+  --primary:#2563eb; --primary2:#1d4ed8; --line:#e5e7eb;
+  --ok:#16a34a; --warn:#d97706; --danger:#dc2626;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#123b73,#2563eb);color:white;padding:18px 22px}
+.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:22px}
+.dut-logo{display:flex;align-items:center;gap:10px;min-width:285px}
+.dut-mark{width:58px;height:58px;border:2px solid rgba(255,255,255,.9);border-radius:8px;display:grid;place-items:center;font-size:25px;font-weight:900;letter-spacing:-2px;background:rgba(255,255,255,.12)}
+.dut-name{line-height:1.08}.dut-name strong{display:block;font-size:20px}.dut-name span{font-size:11px;opacity:.9}
+.slogan{font-size:18px;font-style:italic;opacity:.96;border-left:1px solid rgba(255,255,255,.5);padding-left:18px;white-space:nowrap}
+.title-block{flex:1;text-align:center}.title-block .small-title{font-size:15px;letter-spacing:1.2px;opacity:.9}.title-block h1{margin:2px 0 0;font-size:29px}
+header p{margin:0;opacity:.9}
+@media(max-width:900px){.header-inner{flex-wrap:wrap}.dut-logo{min-width:0}.slogan{font-size:15px}.title-block{text-align:left}}
+.wrap{max-width:1400px;margin:0 auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+.stat .label{color:var(--muted);font-size:13px}.stat .value{font-size:27px;font-weight:700;margin-top:6px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+button,.select,input{font:inherit}
+button{border:0;border-radius:9px;padding:10px 14px;cursor:pointer;background:#e8eefc;color:#173b7a;font-weight:600}
+button.active,button.primary{background:var(--primary);color:white}
+button:hover{filter:brightness(.97)}
+input,select{border:1px solid #d0d5dd;border-radius:8px;padding:9px;background:white}
+.search{min-width:260px;flex:1}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.sem{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.sem h2{margin:0 0 5px;font-size:18px}.sem small{color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:13px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index:1}
+td.course{font-weight:600;min-width:260px}
+.badge{display:inline-block;padding:4px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#eef2ff;color:#3730a3}
+.badge.practice{background:#ecfdf3;color:#166534}.badge.project{background:#fff7ed;color:#9a3412}.badge.elective{background:#f3f4f6;color:#374151}
+.grade{width:66px;text-align:center}.score{font-weight:700}
+.note{font-size:12px;color:var(--muted);margin-top:6px}
+.result{font-size:20px;font-weight:700}
+.alert{padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;margin-top:12px}
+.warning{background:#fff7ed;border-color:#fed7aa}
+.success{background:#ecfdf3;border-color:#bbf7d0}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:25px}
+.settings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.settings label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.muted{color:var(--muted)}
+.hidden{display:none}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.settings{grid-template-columns:1fr}}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.wrap{padding:10px}table{font-size:12px}.grade{width:55px}.search{min-width:180px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="dut-logo" aria-label="DUT - Đại học Bách khoa, Đại học Đà Nẵng">
+      <div class="dut-mark">DUT</div>
+      <div class="dut-name"><strong>ĐẠI HỌC BÁCH KHOA</strong><span>ĐẠI HỌC ĐÀ NẴNG</span></div>
+    </div>
+    <div class="slogan">Tư duy - Sáng tạo - Nhân ái</div>
+    <div class="title-block">
+      <div class="small-title">CHƯƠNG TRÌNH ĐÀO TẠO</div>
+      <h1>📚 TIN HỌC XÂY DỰNG</h1>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card stat"><div class="label">Học phần học kỳ</div><div class="value" id="statCourses">0</div></div>
+    <div class="card stat"><div class="label">Tín chỉ học kỳ</div><div class="value" id="statCredits">0</div></div>
+    <div class="card stat"><div class="label">Điểm trung bình học kỳ (thang 10)</div><div class="value" id="statGpa">—</div></div>
+    <div class="card stat"><div class="label">Điểm tích lũy đã nhập</div><div class="value" id="statCum">—</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="controls">
+      <div>
+        <b>Tỷ lệ tính điểm</b>
+        <span class="muted"> (có thể chỉnh vì ảnh không nêu tỷ lệ)</span>
+      </div>
+      <label>Thành phần <input id="wTp" type="number" min="0" max="100" value="20" style="width:70px">%</label>
+      <label>Giữa kỳ <input id="wGk" type="number" min="0" max="100" value="20" style="width:70px">%</label>
+      <label>Cuối kỳ <input id="wCk" type="number" min="0" max="100" value="60" style="width:70px">%</label>
+      <button class="primary" onclick="saveWeights()">Áp dụng</button>
+      <button onclick="resetAll()">Xóa điểm đã nhập</button>
+    </div>
+    <div class="note">Mặc định 20%–20%–60% chỉ là cấu hình minh họa, không phải tỷ lệ chính thức của trường.</div>
+  </div>
+
+  <div class="controls">
+    <div class="tabs" id="tabs"></div>
+    <input class="search" id="search" placeholder="🔎 Tìm tên học phần..." oninput="render()">
+  </div>
+
+  <div class="card" id="semesterCard"></div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin-top:0">📈 Tổng kết</h2>
+    <div id="summary"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin-top:0">ℹ️ Ghi chú về dữ liệu</h2>
+    <p class="muted">
+      Danh sách học phần được nhập lại từ ảnh chương trình đào tạo bạn gửi. Một số chữ trong ảnh bị mờ,
+      vì vậy cột “Ràng buộc” được để ở dạng “Theo sơ đồ CTĐT” hoặc để trống thay vì tự đoán.
+      Bạn có thể sửa danh sách học phần trong phần mã dữ liệu nếu cần.
+    </p>
+  </div>
+</div>
+
+<footer>Phần mềm chạy trực tiếp trên trình duyệt • Dữ liệu điểm được lưu trên máy bằng LocalStorage.</footer>
+
+<script>
+const courses = [
+ {s:1,n:"Giải tích",c:4,t:"Lý thuyết",r:"—"},
+ {s:1,n:"Vật lý Cơ và Nhiệt",c:3,t:"Lý thuyết",r:"—"},
+ {s:1,n:"Thí nghiệm Vật lý (Cơ và nhiệt)",c:1,t:"Thực hành",r:"Vật lý Cơ và Nhiệt"},
+ {s:1,n:"Nhập môn ngành",c:2,t:"Lý thuyết",r:"—"},
+ {s:1,n:"Triết học Mác - Lênin",c:3,t:"Lý thuyết",r:"—"},
+ {s:1,n:"Hình học - Vẽ kỹ thuật",c:3,t:"Lý thuyết",r:"—"},
+ {s:1,n:"Nhập môn công nghệ số và ứng dụng trí tuệ nhân tạo",c:2,t:"Lý thuyết",r:"—"},
+
+ {s:2,n:"Chủ nghĩa xã hội khoa học",c:2,t:"Lý thuyết",r:"—"},
+ {s:2,n:"Giải tích nâng cao",c:4,t:"Lý thuyết",r:"Giải tích"},
+ {s:2,n:"Đại số tuyến tính",c:3,t:"Lý thuyết",r:"—"},
+ {s:2,n:"Anh văn A2.2",c:4,t:"Lý thuyết",r:"Theo lộ trình Anh văn"},
+ {s:2,n:"Ngôn ngữ lập trình trong xây dựng",c:2,t:"Lý thuyết",r:"—"},
+ {s:2,n:"Hóa đại cương",c:2,t:"Lý thuyết",r:"—"},
+ {s:2,n:"Cơ lý thuyết",c:2,t:"Lý thuyết",r:"—"},
+
+ {s:3,n:"Lịch sử Đảng Cộng sản Việt Nam",c:2,t:"Lý thuyết",r:"—"},
+ {s:3,n:"Cấu trúc và cơ sở dữ liệu trong xây dựng",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:3,n:"Anh văn B1.1",c:3,t:"Lý thuyết",r:"Theo lộ trình Anh văn"},
+ {s:3,n:"Phương pháp tính",c:2,t:"Lý thuyết",r:"—"},
+ {s:3,n:"Sức bền vật liệu",c:3,t:"Lý thuyết",r:"Cơ lý thuyết"},
+ {s:3,n:"Thí nghiệm Sức bền vật liệu",c:.5,t:"Thực hành",r:"Sức bền vật liệu"},
+ {s:3,n:"Trắc địa",c:2,t:"Lý thuyết",r:"—"},
+ {s:3,n:"Thực tập trắc địa",c:1,t:"Thực hành",r:"Trắc địa"},
+ {s:3,n:"Thủy lực",c:2,t:"Lý thuyết",r:"—"},
+ {s:3,n:"Thí nghiệm thủy lực",c:.5,t:"Thực hành",r:"Thủy lực"},
+
+ {s:4,n:"Phân tích và thiết kế kết cấu trong xây dựng",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:4,n:"Kinh tế chính trị Mác - Lênin",c:2,t:"Lý thuyết",r:"—"},
+ {s:4,n:"Ứng dụng xác suất và thống kê trong xây dựng",c:2,t:"Lý thuyết",r:"Theo sơ đồ chương trình đào tạo"},
+ {s:4,n:"Môi trường và phát triển bền vững",c:2,t:"Lý thuyết",r:"—"},
+ {s:4,n:"Cơ học kết cấu 1",c:2,t:"Lý thuyết",r:"Sức bền vật liệu"},
+ {s:4,n:"Cơ học đất",c:2,t:"Lý thuyết",r:"—"},
+ {s:4,n:"Thí nghiệm cơ học đất",c:.5,t:"Thực hành",r:"Cơ học đất"},
+ {s:4,n:"Vật liệu xây dựng",c:2,t:"Lý thuyết",r:"—"},
+ {s:4,n:"Thí nghiệm vật liệu xây dựng",c:.5,t:"Thực hành",r:"Vật liệu xây dựng"},
+ {s:4,n:"Thủy lực công trình",c:2,t:"Lý thuyết",r:"Thủy lực"},
+
+ {s:5,n:"Tư tưởng Hồ Chí Minh",c:2,t:"Lý thuyết",r:"—"},
+ {s:5,n:"Thực hành đồ án BIM: Quy trình",c:1,t:"Thực hành",r:"Theo sơ đồ CTĐT"},
+ {s:5,n:"Phương pháp phân tích nhân",c:2,t:"Lý thuyết",r:"—"},
+ {s:5,n:"Phương pháp nghiên cứu khoa học",c:2,t:"Lý thuyết",r:"—"},
+ {s:5,n:"Cơ học kết cấu 2",c:2,t:"Lý thuyết",r:"Cơ học kết cấu 1"},
+ {s:5,n:"Nền và móng",c:2,t:"Lý thuyết",r:"Cơ học đất"},
+ {s:5,n:"Đồ án nền và móng",c:1,t:"Đồ án",r:"Nền và móng"},
+ {s:5,n:"Kết cấu bê tông cốt thép (phần cơ bản)",c:3,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:5,n:"Đồ án kết cấu bê tông cốt thép",c:1,t:"Đồ án",r:"Kết cấu bê tông cốt thép"},
+ {s:5,n:"Thủy văn",c:2,t:"Lý thuyết",r:"—"},
+
+ {s:6,n:"Pháp luật đại cương",c:2,t:"Lý thuyết",r:"—"},
+ {s:6,n:"Tư duy thiết kế và đổi mới sáng tạo",c:2,t:"Lý thuyết",r:"—"},
+ {s:6,n:"Kết cấu nhà bê tông cốt thép",c:2,t:"Lý thuyết",r:"Kết cấu bê tông cốt thép"},
+ {s:6,n:"Công trình thủy",c:3,t:"Lý thuyết",r:"—"},
+ {s:6,n:"Đồ án Công trình thủy",c:1,t:"Đồ án",r:"Công trình thủy"},
+ {s:6,n:"Cơ sở thiết kế kết cấu thép",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:6,n:"Phần mềm trong xây dựng",c:2,t:"Lý thuyết",r:"—"},
+ {s:6,n:"Ứng dụng GIS trong xây dựng",c:2,t:"Lý thuyết",r:"—"},
+ {s:6,n:"Thực tập nhận thức",c:1,t:"Thực tập",r:"Theo sơ đồ chương trình đào tạo"},
+
+ {s:7,n:"Phân tích nền móng và quan trắc",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:7,n:"Kỹ thuật thi công",c:3,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:7,n:"Kinh tế xây dựng",c:2,t:"Lý thuyết",r:"—"},
+ {s:7,n:"Công nghệ BIM trong xây dựng",c:3,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:7,n:"Công trình giao thông",c:3,t:"Lý thuyết",r:"—"},
+ {s:7,n:"PBL: Thiết kế công trình giao thông",c:2,t:"Đồ án",r:"Công trình giao thông"},
+
+ {s:8,n:"Thiết kế công trình xây dựng",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:8,n:"Thiết kế kết cấu công trình",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:8,n:"Tổ chức thi công",c:2,t:"Lý thuyết",r:"Kỹ thuật thi công"},
+ {s:8,n:"PBL: Công trình xây dựng",c:2,t:"Đồ án",r:"Theo sơ đồ CTĐT"},
+ {s:8,n:"Kết cấu nhà cao tầng",c:2,t:"Lý thuyết",r:"Theo sơ đồ CTĐT"},
+ {s:8,n:"PBL: BIM trong thiết kế kết cấu công trình",c:2,t:"Đồ án",r:"Theo sơ đồ CTĐT"},
+ {s:8,n:"Tự chọn (chọn 2 học phần)",c:4,t:"Tự chọn",r:"Chọn 2 học phần"},
+
+ {s:9,n:"Thực tập tốt nghiệp",c:8,t:"Thực tập",r:"Hoàn thành học phần theo CTĐT"},
+ {s:9,n:"Đồ án tốt nghiệp",c:10,t:"Đồ án",r:"Theo điều kiện của CTĐT"}
+];
+
+let currentSemester = 2;
+const key = "th_xd_grades_v1";
+const weightKey = "th_xd_weights_v1";
+let grades = JSON.parse(localStorage.getItem(key) || "{}");
+let weights = JSON.parse(localStorage.getItem(weightKey) || '{"tp":20,"gk":20,"ck":60}');
+
+function save(){ localStorage.setItem(key, JSON.stringify(grades)); }
+function saveWeights(){
+  const tp=+document.getElementById("wTp").value, gk=+document.getElementById("wGk").value, ck=+document.getElementById("wCk").value;
+  if(tp+gk+ck!==100){alert("Tổng tỷ lệ TP + Giữa kỳ + Cuối kỳ phải bằng 100%."); return;}
+  weights={tp,gk,ck}; localStorage.setItem(weightKey,JSON.stringify(weights)); render();
+}
+function resetAll(){
+  if(confirm("Xóa toàn bộ điểm đã nhập trên thiết bị này?")){
+    grades={}; save(); render();
+  }
+}
+function score(id,part){
+  return grades[id]?.[part] === undefined ? "" : grades[id][part];
+}
+function setScore(id,part,val){
+  if(val==="" || val==null){ if(grades[id]) delete grades[id][part]; }
+  else{
+    val=Math.max(0,Math.min(10,+val));
+    if(!grades[id]) grades[id]={};
+    grades[id][part]=val;
+  }
+  save(); render();
+}
+function finalScore(id){
+  const g=grades[id]; if(!g) return null;
+  if([g.tp,g.gk,g.ck].some(v=>v===undefined)) return null;
+  return (g.tp*weights.tp+g.gk*weights.gk+g.ck*weights.ck)/100;
+}
+function semesterCourses(s){
+  const q=(document.getElementById("search")?.value||"").toLowerCase().trim();
+  return courses.filter(x=>x.s===s && (!q || x.n.toLowerCase().includes(q)));
+}
+function semesterStats(s){
+  const all=courses.filter(x=>x.s===s);
+  let credits=0, weighted=0, doneCredits=0, doneCourses=0;
+  all.forEach(x=>{
+    credits+=x.c;
+    const fs=finalScore(courseId(x));
+    if(fs!==null){weighted+=fs*x.c; doneCredits+=x.c; doneCourses++;}
+  });
+  return {all,credits,gpa:doneCredits?weighted/doneCredits:null,doneCourses,doneCredits};
+}
+function courseId(x){return "s"+x.s+"_"+courses.indexOf(x)}
+function typeBadge(t){
+  const cls=t==="Thực hành"||t==="Thực tập"?"practice":t==="Đồ án"?"project":t==="Tự chọn"?"elective":"";
+  return `<span class="badge ${cls}">${t}</span>`;
+}
+function renderTabs(){
+  const tabs=document.getElementById("tabs");
+  tabs.innerHTML="";
+  for(let s=1;s<=9;s++){
+    const st=semesterStats(s);
+    const b=document.createElement("button");
+    b.textContent=`Học kỳ ${s}`;
+    if(s===currentSemester)b.className="active";
+    b.onclick=()=>{currentSemester=s;render()};
+    tabs.appendChild(b);
+  }
+}
+function render(){
+  document.getElementById("wTp").value=weights.tp;
+  document.getElementById("wGk").value=weights.gk;
+  document.getElementById("wCk").value=weights.ck;
+  renderTabs();
+  const st=semesterStats(currentSemester);
+  const visible=semesterCourses(currentSemester);
+  document.getElementById("statCourses").textContent=st.all.length;
+  document.getElementById("statCredits").textContent=st.credits;
+  document.getElementById("statGpa").textContent=st.gpa===null?"—":st.gpa.toFixed(2);
+  document.getElementById("statCum").textContent=cumulativeGpa()===null?"—":cumulativeGpa().toFixed(2);
+
+  let rows=visible.map(x=>{
+    const id=courseId(x), fs=finalScore(id);
+    return `<tr>
+      <td class="course">${x.n}</td>
+      <td>${x.c}</td>
+      <td>${typeBadge(x.t)}</td>
+      <td>${x.r}</td>
+      <td><input class="grade" type="number" min="0" max="10" step=".1" value="${score(id,'tp')}" onchange="setScore('${id}','tp',this.value)"></td>
+      <td><input class="grade" type="number" min="0" max="10" step=".1" value="${score(id,'gk')}" onchange="setScore('${id}','gk',this.value)"></td>
+      <td><input class="grade" type="number" min="0" max="10" step=".1" value="${score(id,'ck')}" onchange="setScore('${id}','ck',this.value)"></td>
+      <td class="score">${fs===null?"—":fs.toFixed(2)}</td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("semesterCard").innerHTML=`
+    <div class="sem">
+      <h2>Học kỳ ${currentSemester} <small>(${st.credits} tín chỉ theo danh sách)</small></h2>
+      <div class="note">Đã nhập đủ điểm: ${st.doneCourses}/${st.all.length} học phần • ${st.doneCredits} tín chỉ</div>
+      <div style="overflow:auto;margin-top:12px">
+      <table>
+        <thead><tr>
+          <th>Học phần</th><th>Tín chỉ</th><th>Loại</th><th>Ràng buộc</th>
+          <th>Điểm thành phần</th><th>Giữa kỳ</th><th>Cuối kỳ</th><th>Điểm Học phần</th>
+        </tr></thead>
+        <tbody>${rows || `<tr><td colspan="8" class="muted">Không tìm thấy học phần.</td></tr>`}</tbody>
+      </table></div>
+    </div>`;
+  renderSummary();
+}
+function cumulativeGpa(){
+  let weighted=0, credits=0;
+  courses.forEach(x=>{
+    const fs=finalScore(courseId(x));
+    if(fs!==null){weighted+=fs*x.c;credits+=x.c;}
+  });
+  return credits?weighted/credits:null;
+}
+function renderSummary(){
+  const cur=semesterStats(currentSemester), cum=cumulativeGpa();
+  const bySem=[];
+  for(let s=1;s<=9;s++){
+    const st=semesterStats(s);
+    bySem.push(`<tr><td>Học kỳ ${s}</td><td>${st.all.length}</td><td>${st.credits}</td><td>${st.doneCredits}</td><td>${st.gpa===null?"—":st.gpa.toFixed(2)}</td></tr>`);
+  }
+  document.getElementById("summary").innerHTML=`
+    <div class="grid" style="margin-bottom:10px">
+      <div class="card"><div class="label">Điểm trung bình học kỳ ${currentSemester}</div><div class="result">${cur.gpa===null?"Chưa đủ điểm":cur.gpa.toFixed(2)}</div></div>
+      <div class="card"><div class="label">Điểm tích lũy toàn bộ đã nhập</div><div class="result">${cum===null?"Chưa có":cum.toFixed(2)}</div></div>
+      <div class="card"><div class="label">Số Học phần Học kỳ ${currentSemester}</div><div class="result">${cur.all.length}</div></div>
+      <div class="card"><div class="label">Số tín chỉ học kỳ ${currentSemester}</div><div class="result">${cur.credits}</div></div>
+    </div>
+    <div class="alert ${currentSemester>1 && semesterStats(currentSemester-1).gpa!==null?'success':'warning'}">
+      ${currentSemester>1
+        ? `Học kỳ ${currentSemester}: điểm tích lũy từ các học phần đã nhập của các học kỳ trước là <b>${cumulativeBefore(currentSemester)===null?"chưa có":cumulativeBefore(currentSemester).toFixed(2)}</b>.`
+        : `Đây là học kỳ đầu tiên; chưa có học kỳ trước để tính điểm tích lũy.`
+      }
+    </div>
+    <div style="overflow:auto;margin-top:14px">
+      <table><thead><tr><th>Học kỳ</th><th>Số Học phần</th><th>Tín chỉ</th><th>Tín chỉ đã có điểm</th><th>Điểm trung bình học kỳ</th></tr></thead>
+      <tbody>${bySem.join("")}</tbody></table>
+    </div>`;
+}
+function cumulativeBefore(s){
+  let w=0,c=0;
+  courses.filter(x=>x.s<s).forEach(x=>{
+    const fs=finalScore(courseId(x));
+    if(fs!==null){w+=fs*x.c;c+=x.c;}
+  });
+  return c?w/c:null;
+}
+render();
+</script>
+</body>
+</html>
